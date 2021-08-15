@@ -21,7 +21,7 @@ public enum HttpMethods {
         method -> List.of(method.getAnnotation(PutMapping.class).value()));
 
     private final Class<? extends Annotation> typeToken;
-    private final HttpMethod httpMedthod;
+    private final HttpMethod httpMethod;
     private final Function<Method, List<String>> values;
 
     HttpMethods(
@@ -30,7 +30,7 @@ public enum HttpMethods {
         Function<Method, List<String>> values
     ) {
         this.typeToken = typeToken;
-        this.httpMedthod = httpMethod;
+        this.httpMethod = httpMethod;
         this.values = values;
     }
 
@@ -40,5 +40,13 @@ public enum HttpMethods {
             .map(httpMethods -> httpMethods.values.apply(method))
             .findAny()
             .orElse(List.of(""));
+    }
+
+    public static HttpMethod getHttpMethod(Method method) {
+        return List.of(values()).stream()
+            .filter(httpMethod -> method.isAnnotationPresent(httpMethod.typeToken))
+            .map(httpMethod -> httpMethod.httpMethod)
+            .findAny()
+            .orElseThrow(IllegalArgumentException::new);
     }
 }
