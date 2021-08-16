@@ -1,22 +1,28 @@
 package com.example.component_scan.scanner;
 
-import static java.util.stream.Collectors.toList;
-
+import java.util.ArrayList;
 import java.util.List;
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
 
 public class ClassesScanner {
 
-    public List<Class<?>> getAllClasses(String basePackage) {
-        Reflections reflections = new Reflections(
-            basePackage,
-            new SubTypesScanner(false)
-        );
+    private final CanonicalPathScanner canonicalPathScanner;
 
-        return reflections.getSubTypesOf(Object.class)
-            .stream()
-            .distinct()
-            .collect(toList());
+    public ClassesScanner(CanonicalPathScanner canonicalPathScanner) {
+        this.canonicalPathScanner = canonicalPathScanner;
+    }
+
+    public List<Class<?>> getAllClasses() {
+        try {
+            List<Class<?>> classes = new ArrayList<>();
+            List<String> canonicalPaths = canonicalPathScanner.getAllCanonicalPaths();
+
+            for (String canonicalPath : canonicalPaths) {
+                classes.add(Class.forName(canonicalPath));
+            }
+
+            return classes;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

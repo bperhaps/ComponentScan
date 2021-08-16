@@ -1,5 +1,6 @@
 package com.example.component_scan.config;
 
+import com.example.component_scan.scanner.CanonicalPathScanner;
 import com.example.component_scan.scanner.ClassesScanner;
 import com.example.component_scan.scanner.ControllerScanner;
 import com.example.component_scan.scanner.URIScanner;
@@ -18,7 +19,9 @@ public class TestConfiguration implements WebMvcConfigurer {
     }
 
     private List<UriAndMethod> getUriAndMethods() {
-        List<Class<?>> allClasses = new ClassesScanner().getAllClasses("com.example");
+        List<Class<?>> allClasses = new ClassesScanner(
+            new CanonicalPathScanner("com.example")
+        ).getAllClasses();
         return new URIScanner(new ControllerScanner(allClasses)).extractUriAndMethods();
     }
 }
